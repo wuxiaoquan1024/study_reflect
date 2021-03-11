@@ -1,0 +1,86 @@
+package com.example.myapplication;
+
+import android.util.Log;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
+public class P{
+    class Plate<T> {
+        private T item;
+        public Plate(T t){item=t;}
+        public void set(T t){item=t;}
+        public T get(){return item;}
+    }
+
+    //Lev 1
+    class Food{}
+
+    //Lev 2
+    class Fruit extends Food{}
+    class Meat extends Food{}
+
+    //Lev 3
+    class Apple extends Fruit{}
+    class Banana extends Fruit{}
+    class Pork extends Meat{}
+    class Beef extends Meat{}
+
+    //Lev 4
+    class RedApple extends Apple{}
+    class GreenApple extends Apple{}
+
+    public void test() {
+        //错误不能将Apple 添加到指定为Fruit的盘子中, 与指定的类型不符合
+//        Plate<Fruit> p = new Plate<>(new Apple());
+
+        //错误，上边界只能添加Fruit 或者子类
+//        Plate<? extends Fruit> pFood = new Plate<Fruit>(new Food()));
+
+        //上界<? extends T>不能往里存，只能往外取
+        Plate<? extends Fruit> pExtend = new Plate<Fruit>(new Banana());
+//        pExtend.set(new Apple()); Error
+//        pExtend.set(new Fruit()); Error
+        Fruit fruit = pExtend.get();
+
+
+        //下边界<? super T> 能往里面存， 去失效
+        Plate<? super Fruit> pSpuer = new Plate<>(new Fruit());
+        pSpuer.set(new Fruit());
+        pSpuer.set(new Banana());
+
+        Object object = pSpuer.get();
+
+        /*
+        PECS 原则
+            频繁往外读取内容的，适合用上界Extends。
+            经常往里插入的，适合用下界Super。
+         */
+
+
+        Plate<Food> po = new Plate<>(new Food());
+        //只能传fruit 的父类型
+//        testSuper(new Plate<Banana>(new Banana())); //Error
+        testSuper(po);
+
+        Plate<Banana> pb = new Plate<>(new Banana());
+        //只能传Fruit 的子类
+//        testextend(po); Error
+        testextend(pb);
+
+    }
+
+    private void testSuper(Plate<? super Fruit> p) {
+        p.set(new Banana());
+    }
+
+    private void testextend(Plate<? extends Fruit> p) {
+        p.get();
+    }
+
+}
+
+
+
+
+
